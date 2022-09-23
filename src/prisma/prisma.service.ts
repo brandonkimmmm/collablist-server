@@ -47,7 +47,7 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
     }
 
     async truncate() {
-        const records = await this.$queryRawUnsafe<Array<any>>(`
+        const records = await this.$queryRawUnsafe(`
 			SELECT tablename
 			FROM pg_tables
 			WHERE schemaname = 'public'
@@ -71,7 +71,7 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
     }
 
     async resetSequences() {
-        const results = await this.$queryRawUnsafe<Array<any>>(
+        const results = await this.$queryRawUnsafe(
             `SELECT c.relname
 				FROM pg_class AS c
 					JOIN pg_namespace AS n ON c.relnamespace = n.oid
