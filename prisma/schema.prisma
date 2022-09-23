@@ -1,0 +1,73 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+    provider      = "prisma-client-js"
+    binaryTargets = ["native", "debian-openssl-1.1.x", "debian-openssl-3.0.x"]
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+enum Role {
+    USER
+    ADMIN
+}
+
+model User {
+    id          Int          @id @default(autoincrement())
+    email       String       @unique @db.VarChar(255)
+    username    String       @db.VarChar(255)
+    password    String       @db.VarChar(255)
+    first_name  String       @db.VarChar(255)
+    last_name   String       @db.VarChar(255)
+    role        Role         @default(USER)
+    created_at  DateTime     @default(now())
+    updated_at  DateTime     @updatedAt
+    lists       List[]
+    memberships Membership[]
+
+    @@map("users")
+}
+
+model List {
+    id          Int          @id @default(autoincrement())
+    title       String       @db.VarChar(255)
+    description String       @db.VarChar(255)
+    created_at  DateTime     @default(now())
+    updated_at  DateTime     @updatedAt
+    user_id     Int
+    user        User         @relation(fields: [user_id], references: [id])
+    memberships Membership[]
+    items       ListItem[]
+
+    @@map("lists")
+}
+
+model ListItem {
+    id         Int      @id @default(autoincrement())
+    title      String   @db.VarChar(255)
+    amount     Float
+    status     Boolean  @default(false)
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt
+    list_id    Int
+    list       List     @relation(fields: [list_id], references: [id])
+
+    @@map("list_items")
+}
+
+model Membership {
+    user           User     @relation(fields: [user_id], references: [id])
+    user_id        Int
+    list           List     @relation(fields: [list_id], references: [id])
+    list_id        Int
+    is_contributor Boolean  @default(false)
+    created_at     DateTime @default(now())
+    updated_at     DateTime @updatedAt
+
+    @@id([user_id, list_id])
+    @@map("memberships")
+}
