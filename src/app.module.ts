@@ -32,7 +32,7 @@ import { nanoid } from 'nanoid';
                                       translateTime: true
                                   }
                               },
-                              customLogLevel: (res, err) => {
+                              customLogLevel: (req, res, err) => {
                                   if (
                                       res.statusCode >= 400 &&
                                       res.statusCode < 500

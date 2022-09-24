@@ -52,7 +52,7 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
 			FROM pg_tables
 			WHERE schemaname = 'public'
 		`);
-        for (const record of records) {
+        for (const record of records as any) {
             await this.truncateTable(record['tablename']);
         }
     }
@@ -78,7 +78,7 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
 				WHERE c.relkind = 'S'
 				AND n.nspname = 'public'`
         );
-        for (const record of results) {
+        for (const record of results as any) {
             // eslint-disable-next-line no-await-in-loop
             await this.$executeRawUnsafe(
                 `ALTER SEQUENCE "public"."${record['relname']}" RESTART WITH 1;`
