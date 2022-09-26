@@ -1,4 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { Controller, Logger } from '@nestjs/common';
+import { AuthService } from './auth.service';
 
-@Injectable()
-export class AuthService {}
+@Controller()
+export class AuthController {
+    private readonly logger: Logger = new Logger(AuthController.name);
+
+    constructor(private readonly authService: AuthService) {}
+
+    async postLogin();
+}
