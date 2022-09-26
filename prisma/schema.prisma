@@ -41,7 +41,7 @@ model List {
     created_at  DateTime     @default(now())
     updated_at  DateTime     @updatedAt
     user_id     Int
-    user        User         @relation(fields: [user_id], references: [id])
+    user        User         @relation(fields: [user_id], references: [id], onDelete: Cascade)
     memberships Membership[]
     items       ListItem[]
 
@@ -56,15 +56,15 @@ model ListItem {
     created_at DateTime @default(now())
     updated_at DateTime @updatedAt
     list_id    Int
-    list       List     @relation(fields: [list_id], references: [id])
+    list       List     @relation(fields: [list_id], references: [id], onDelete: Cascade)
 
     @@map("list_items")
 }
 
 model Membership {
-    user           User     @relation(fields: [user_id], references: [id])
+    user           User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
     user_id        Int
-    list           List     @relation(fields: [list_id], references: [id])
+    list           List     @relation(fields: [list_id], references: [id], onDelete: Cascade)
     list_id        Int
     is_contributor Boolean  @default(false)
     created_at     DateTime @default(now())
