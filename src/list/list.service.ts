@@ -16,7 +16,7 @@ export class ListService {
             where: { id: listId },
             select: {
                 user_id: true,
-                memberships: {
+                members: {
                     select: {
                         user_id: true
                     }
@@ -26,7 +26,7 @@ export class ListService {
         if (
             reqUser.role !== USER_ROLE.ADMIN &&
             list.user_id !== reqUser.id &&
-            !list.memberships.find((m) => m.user_id === reqUser.id)
+            !list.members.find((m) => m.user_id === reqUser.id)
         ) {
             throw new UnauthorizedException(NOT_AUTHORIZED_FOR_LIST);
         }
@@ -65,7 +65,7 @@ export class ListService {
                         email: true
                     }
                 },
-                memberships: {
+                members: {
                     select: {
                         user: {
                             select: {
@@ -106,7 +106,7 @@ export class ListService {
                         email: true
                     }
                 },
-                memberships: {
+                members: {
                     select: {
                         user: {
                             select: {
