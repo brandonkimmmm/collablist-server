@@ -8,6 +8,7 @@ import { LoggerModule } from 'nestjs-pino';
 import { nanoid } from 'nanoid';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
+import { ListModule } from './list/list.module';
 
 @Module({
     imports: [
@@ -79,7 +80,8 @@ import { AuthModule } from './auth/auth.module';
         }),
         PrismaModule,
         UserModule,
-        AuthModule
+        AuthModule,
+        ListModule
     ],
     controllers: [AppController],
     providers: [AppService]

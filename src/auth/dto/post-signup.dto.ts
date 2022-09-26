@@ -7,6 +7,7 @@ import {
     Matches
 } from 'class-validator';
 import { PASSWORD_REGEX } from 'src/shared/constants';
+import { IsEqualTo } from 'src/shared/decorators/equal-to.decorator';
 
 export class PostSignupDTO {
     @IsEmail()
@@ -16,7 +17,7 @@ export class PostSignupDTO {
     @Matches(PASSWORD_REGEX)
     readonly password: string;
 
-    @Matches(PASSWORD_REGEX)
+    @IsEqualTo('password')
     readonly password_confirmation: string;
 
     @IsString()
