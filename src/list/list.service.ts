@@ -6,6 +6,7 @@ import { SerializedUser } from 'src/shared/types/user.type';
 import {
     PostListsDTO,
     PostListsIdItemsDTO,
+    PostListsIdMembersDTO,
     PutListsIdDTO,
     PutListsIdItemsIdDTO
 } from './dto';
@@ -216,6 +217,51 @@ export class ListService {
                 status: true,
                 created_at: true,
                 updated_at: true
+            }
+        });
+    }
+
+    async createListMembers(listId: number, dto: PostListsIdMembersDTO) {
+        return this.prismaService.membership.createMany({
+            skipDuplicates: true,
+            data: dto.user_ids.map((userId) => ({
+                list_id: listId,
+                user_id: userId
+            }))
+        });
+    }
+
+    async findListMembers(listId: number) {
+        return this.prismaService.membership.findMany({
+            where: {
+                list_id: listId
+            },
+            select: {
+                user: {
+                    select: {
+                        id: true,
+                        email: true
+                    }
+                }
+            }
+        });
+    }
+
+    async deleteListMember(listId: number, memberId: number) {
+        return this.prismaService.membership.delete({
+            where: {
+                user_id_list_id: {
+                    list_id: listId,
+                    user_id: memberId
+                }
+            },
+            select: {
+                user: {
+                    select: {
+                        id: true,
+                        email: true
+                    }
+                }
             }
         });
     }
