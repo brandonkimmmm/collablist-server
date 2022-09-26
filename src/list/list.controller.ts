@@ -11,11 +11,18 @@ import {
 } from '@nestjs/common';
 import { JwtGuard } from 'src/auth/jwt/jwt.guard';
 import { ReqUser } from 'src/shared/decorators/req-user.decorator';
-import { GetIdDTO } from 'src/shared/dto';
 import { SerializedUser } from 'src/shared/types/user.type';
-import { PostListsDTO, PutListsIdDTO } from './dto';
+import {
+    PostListsDTO,
+    PutListsIdDTO,
+    ParamListIdDTO,
+    PostListsIdItemsDTO,
+    PutListsIdItemsIdDTO,
+    ParamListItemIdDTO
+} from './dto';
 import { ListService } from './list.service';
-import { ListParamIdPipe } from './pipes/list-param-id.pipe';
+import { ListIdParamPipe } from './pipes/list-id-param.pipe';
+import { ListItemIdParamPipe } from './pipes/list-item-id-param.pipe';
 
 @Controller('lists')
 export class ListController {
@@ -30,37 +37,72 @@ export class ListController {
         return this.listService.createList(reqUser, dto);
     }
 
-    @Get(':id')
+    @Get(':list_id')
     @UseGuards(JwtGuard)
-    @UsePipes(ListParamIdPipe)
+    @UsePipes(ListIdParamPipe)
     async getListsId(
         @ReqUser() reqUser: SerializedUser,
-        @Param() { id }: GetIdDTO
+        @Param() { list_id }: ParamListIdDTO
     ) {
-        await this.listService.authorizeReqUserList(id, reqUser);
-        return this.listService.findList(id);
+        await this.listService.authorizeReqUserList(list_id, reqUser);
+        return this.listService.findList(list_id);
     }
 
-    @Put(':id')
+    @Put(':list_id')
     @UseGuards(JwtGuard)
-    @UsePipes(ListParamIdPipe)
-    async putListsID(
+    @UsePipes(ListIdParamPipe)
+    async putListsId(
         @ReqUser() reqUser: SerializedUser,
-        @Param() { id }: GetIdDTO,
+        @Param() { list_id }: ParamListIdDTO,
         @Body() dto: PutListsIdDTO
     ) {
-        await this.listService.authorizeReqUserList(id, reqUser);
-        return this.listService.updateList(id, dto);
+        await this.listService.authorizeReqUserList(list_id, reqUser);
+        return this.listService.updateList(list_id, dto);
     }
 
-    @Delete(':id')
+    @Delete(':list_id')
     @UseGuards(JwtGuard)
-    @UsePipes(ListParamIdPipe)
-    async deleteListsID(
+    @UsePipes(ListIdParamPipe)
+    async deleteListsId(
         @ReqUser() reqUser: SerializedUser,
-        @Param() { id }: GetIdDTO
+        @Param() { list_id }: ParamListIdDTO
     ) {
-        await this.listService.authorizeReqUserList(id, reqUser);
-        return this.listService.deleteList(id);
+        await this.listService.authorizeReqUserList(list_id, reqUser);
+        return this.listService.deleteList(list_id);
+    }
+
+    @Post(':list_id/items')
+    @UseGuards(JwtGuard)
+    @UsePipes(ListIdParamPipe)
+    async postListsIdItems(
+        @ReqUser() reqUser: SerializedUser,
+        @Param() { list_id }: ParamListIdDTO,
+        @Body() dto: PostListsIdItemsDTO
+    ) {
+        await this.listService.authorizeReqUserList(list_id, reqUser);
+        return this.listService.createListItem(list_id, dto);
+    }
+
+    @Put(':list_id/items/:list_item_id')
+    @UseGuards(JwtGuard)
+    @UsePipes(ListItemIdParamPipe)
+    async putListsIdItemsId(
+        @ReqUser() reqUser: SerializedUser,
+        @Param() { list_id, list_item_id }: ParamListItemIdDTO,
+        @Body() dto: PutListsIdItemsIdDTO
+    ) {
+        await this.listService.authorizeReqUserList(list_id, reqUser);
+        return this.listService.updateListItem(list_item_id, dto);
+    }
+
+    @Delete(':list_id/items/:list_item_id')
+    @UseGuards(JwtGuard)
+    @UsePipes(ListItemIdParamPipe)
+    async deleteListsIdItemsId(
+        @ReqUser() reqUser: SerializedUser,
+        @Param() { list_id, list_item_id }: ParamListItemIdDTO
+    ) {
+        await this.listService.authorizeReqUserList(list_id, reqUser);
+        return this.listService.deleteListItem(list_item_id);
     }
 }

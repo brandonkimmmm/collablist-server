@@ -3,7 +3,12 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { USER_ROLE } from 'src/shared/constants';
 import { NOT_AUTHORIZED_FOR_LIST } from 'src/shared/messages';
 import { SerializedUser } from 'src/shared/types/user.type';
-import { PostListsDTO, PutListsIdDTO } from './dto';
+import {
+    PostListsDTO,
+    PostListsIdItemsDTO,
+    PutListsIdDTO,
+    PutListsIdItemsIdDTO
+} from './dto';
 
 @Injectable()
 export class ListService {
@@ -146,6 +151,71 @@ export class ListService {
                         email: true
                     }
                 }
+            }
+        });
+    }
+
+    async createListItem(
+        listId: number,
+        { title, amount }: PostListsIdItemsDTO
+    ) {
+        return this.prismaService.listItem.create({
+            data: {
+                list: {
+                    connect: {
+                        id: listId
+                    }
+                },
+                title,
+                amount
+            },
+            select: {
+                id: true,
+                title: true,
+                amount: true,
+                status: true,
+                created_at: true,
+                updated_at: true
+            }
+        });
+    }
+
+    async updateListItem(
+        listItemId: number,
+        { title, amount, status }: PutListsIdItemsIdDTO
+    ) {
+        return this.prismaService.listItem.update({
+            where: {
+                id: listItemId
+            },
+            data: {
+                title,
+                amount,
+                status
+            },
+            select: {
+                id: true,
+                title: true,
+                amount: true,
+                status: true,
+                created_at: true,
+                updated_at: true
+            }
+        });
+    }
+
+    async deleteListItem(listItemId: number) {
+        return this.prismaService.listItem.delete({
+            where: {
+                id: listItemId
+            },
+            select: {
+                id: true,
+                title: true,
+                amount: true,
+                status: true,
+                created_at: true,
+                updated_at: true
             }
         });
     }
