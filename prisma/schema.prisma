@@ -42,7 +42,7 @@ model List {
     updated_at  DateTime     @updatedAt
     user_id     Int
     user        User         @relation(fields: [user_id], references: [id], onDelete: Cascade)
-    memberships Membership[]
+    members     Membership[]
     items       ListItem[]
 
     @@map("lists")
