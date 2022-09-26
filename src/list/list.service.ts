@@ -129,4 +129,24 @@ export class ListService {
             }
         });
     }
+
+    async deleteList(listId: number) {
+        return this.prismaService.list.delete({
+            where: {
+                id: listId
+            },
+            select: {
+                id: true,
+                title: true,
+                created_at: true,
+                updated_at: true,
+                user: {
+                    select: {
+                        id: true,
+                        email: true
+                    }
+                }
+            }
+        });
+    }
 }

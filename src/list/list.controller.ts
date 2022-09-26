@@ -1,6 +1,7 @@
 import {
     Body,
     Controller,
+    Delete,
     Get,
     Param,
     Post,
@@ -50,5 +51,16 @@ export class ListController {
     ) {
         await this.listService.authorizeReqUserList(id, reqUser);
         return this.listService.updateList(id, dto);
+    }
+
+    @Delete(':id')
+    @UseGuards(JwtGuard)
+    @UsePipes(ListParamIdPipe)
+    async deleteListsID(
+        @ReqUser() reqUser: SerializedUser,
+        @Param() { id }: GetIdDTO
+    ) {
+        await this.listService.authorizeReqUserList(id, reqUser);
+        return this.listService.deleteList(id);
     }
 }
