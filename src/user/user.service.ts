@@ -1,4 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
@@ -11,5 +12,9 @@ export class UserService {
         this.logger.debug(`isExistingUserEmail email`, { email });
         const count = await this.prismaService.user.count({ where: { email } });
         return count === 1;
+    }
+
+    async createUser(args: Prisma.UserCreateArgs) {
+        return this.prismaService.user.create(args);
     }
 }

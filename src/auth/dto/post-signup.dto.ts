@@ -1,0 +1,34 @@
+import { Transform } from 'class-transformer';
+import {
+    IsEmail,
+    IsNotEmpty,
+    IsOptional,
+    IsString,
+    Matches
+} from 'class-validator';
+import { PASSWORD_REGEX } from 'src/shared/constants';
+
+export class PostSignupDTO {
+    @IsEmail()
+    @Transform(({ value }) => value.toLowerCase())
+    readonly email: string;
+
+    @Matches(PASSWORD_REGEX)
+    readonly password: string;
+
+    @Matches(PASSWORD_REGEX)
+    readonly password_confirmation: string;
+
+    @IsString()
+    @IsNotEmpty()
+    readonly first_name: string;
+
+    @IsString()
+    @IsNotEmpty()
+    readonly last_name: string;
+
+    @IsOptional()
+    @IsString()
+    @IsNotEmpty()
+    readonly username?: string;
+}
