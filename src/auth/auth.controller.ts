@@ -1,5 +1,8 @@
-import { Controller, Logger } from '@nestjs/common';
+import { Controller, Logger, Post, UseGuards } from '@nestjs/common';
+import { ReqUser } from 'src/shared/decorators/req-user.decorator';
+import { SerializedUser } from 'src/shared/types/user.type';
 import { AuthService } from './auth.service';
+import { LocalGuard } from './local/local.guard';
 
 @Controller()
 export class AuthController {
@@ -7,5 +10,13 @@ export class AuthController {
 
     constructor(private readonly authService: AuthService) {}
 
-    async postLogin();
+    @Post('login')
+    @UseGuards(LocalGuard)
+    async postLogin(@ReqUser() user: SerializedUser) {
+        const token = await this.authService.createJwtToken(user);
+        return {
+            token,
+            user
+        };
+    }
 }

@@ -7,6 +7,7 @@ import configuration from './config';
 import { LoggerModule } from 'nestjs-pino';
 import { nanoid } from 'nanoid';
 import { UserModule } from './user/user.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
     imports: [
@@ -77,7 +78,8 @@ import { UserModule } from './user/user.module';
             inject: [ConfigService]
         }),
         PrismaModule,
-        UserModule
+        UserModule,
+        AuthModule
     ],
     controllers: [AppController],
     providers: [AppService]
