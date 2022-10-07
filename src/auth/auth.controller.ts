@@ -7,7 +7,6 @@ import {
     Post,
     UseGuards
 } from '@nestjs/common';
-import { omit } from 'lodash';
 import { ReqUser } from 'src/shared/decorators/req-user.decorator';
 import {
     INVALID_PASSWORD_CONFIRMATION,
@@ -61,15 +60,15 @@ export class AuthController {
             throw new BadRequestException(INVALID_PASSWORD_CONFIRMATION);
         const isTakenEmail = await this.userService.isExistingUserEmail(email);
         if (isTakenEmail) throw new BadRequestException(USER_EXISTS(email));
-        const user = await this.userService.createUser({
+        await this.userService.createUser({
             data: {
                 email,
                 password,
                 first_name,
                 last_name,
-                username
+                username: username || email.split('@')[0]
             }
         });
-        return omit(user, 'password');
+        return { message: 'Success' };
     }
 }
