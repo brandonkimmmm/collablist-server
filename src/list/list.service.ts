@@ -1,15 +1,16 @@
 import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { USER_ROLE } from 'src/shared/constants';
 import { NOT_AUTHORIZED_FOR_LIST } from 'src/shared/messages';
 import { SerializedUser } from 'src/shared/types/user.type';
 import {
-    GetListsDTO,
-    PostListsDTO,
-    PostListsIdItemsDTO,
-    PostListsIdMembersDTO,
-    PutListsIdDTO,
-    PutListsIdItemsIdDTO
+	GetListsDTO,
+	PostListsDTO,
+	PostListsIdItemsDTO,
+	PostListsIdMembersDTO,
+	PutListsIdDTO,
+	PutListsIdItemsIdDTO
 } from './dto';
 
 @Injectable()
@@ -61,24 +62,77 @@ export class ListService {
         page,
         user_id
     }: GetListsDTO & { user_id?: number }) {
+        const whereArgs: Prisma.ListWhereInput = {};
+
+        if (user_id) {
+            whereArgs.OR = [
+                { user_id },
+                {
+                    members: {
+                        some: {
+                            user_id
+                        }
+                    }
+                }
+            ];
+        }
+
         const [count, data] = await this.prismaService.$transaction([
             this.prismaService.list.count({
-                where: {
-                    user_id
-                }
+                where: whereArgs
             }),
             this.prismaService.list.findMany({
-                where: {
-                    user_id
-                },
+                where: whereArgs,
                 orderBy: {
                     created_at: 'desc'
                 },
-                ...this.prismaService.generatePaginationQuery(limit, page)
+                ...this.prismaService.generatePaginationQuery(limit, page),
+                select: {
+                    id: true,
+                    title: true,
+                    description: true,
+                    created_at: true,
+                    updated_at: true,
+                    user: {
+                        select: {
+                            id: true,
+                            email: true,
+                            first_name: true,
+                            last_name: true,
+                            username: true
+                        }
+                    },
+                    members: {
+                        select: {
+                            user: {
+                                select: {
+                                    id: true,
+                                    email: true,
+                                    first_name: true,
+                                    last_name: true,
+                                    username: true
+                                }
+                            }
+                        }
+                    },
+                    items: {
+                        select: {
+                            id: true,
+                            title: true,
+                            amount: true,
+                            status: true,
+                            created_at: true,
+                            updated_at: true
+                        }
+                    }
+                }
             })
         ]);
 
-        return { count, data };
+        return {
+            count,
+            data
+        };
     }
 
     async findList(listId: number) {

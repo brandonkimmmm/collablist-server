@@ -1,14 +1,14 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { nanoid } from 'nanoid';
+import { LoggerModule } from 'nestjs-pino';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { PrismaModule } from './prisma/prisma.module';
-import configuration from './config';
-import { LoggerModule } from 'nestjs-pino';
-import { nanoid } from 'nanoid';
-import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
+import configuration from './config';
 import { ListModule } from './list/list.module';
+import { PrismaModule } from './prisma/prisma.module';
+import { UserModule } from './user/user.module';
 
 @Module({
     imports: [
