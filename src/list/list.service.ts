@@ -4,6 +4,7 @@ import { USER_ROLE } from 'src/shared/constants';
 import { NOT_AUTHORIZED_FOR_LIST } from 'src/shared/messages';
 import { SerializedUser } from 'src/shared/types/user.type';
 import {
+    GetListsDTO,
     PostListsDTO,
     PostListsIdItemsDTO,
     PostListsIdMembersDTO,
@@ -53,6 +54,31 @@ export class ListService {
                 }
             }
         });
+    }
+
+    async findLists({
+        limit,
+        page,
+        user_id
+    }: GetListsDTO & { user_id?: number }) {
+        const [count, data] = await this.prismaService.$transaction([
+            this.prismaService.list.count({
+                where: {
+                    user_id
+                }
+            }),
+            this.prismaService.list.findMany({
+                where: {
+                    user_id
+                },
+                orderBy: {
+                    created_at: 'desc'
+                },
+                ...this.prismaService.generatePaginationQuery(limit, page)
+            })
+        ]);
+
+        return { count, data };
     }
 
     async findList(listId: number) {

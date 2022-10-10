@@ -6,6 +6,7 @@ import {
     Param,
     Post,
     Put,
+    Query,
     UseGuards,
     UsePipes
 } from '@nestjs/common';
@@ -14,14 +15,15 @@ import { ReqUser } from 'src/shared/decorators/req-user.decorator';
 import { SerializedUser } from 'src/shared/types/user.type';
 import { UserService } from 'src/user/user.service';
 import {
-    PostListsDTO,
-    PutListsIdDTO,
+    GetListsDTO,
     ParamListIdDTO,
-    PostListsIdItemsDTO,
-    PutListsIdItemsIdDTO,
     ParamListItemIdDTO,
+    ParamListMemberIdDTO,
+    PostListsDTO,
+    PostListsIdItemsDTO,
     PostListsIdMembersDTO,
-    ParamListMemberIdDTO
+    PutListsIdDTO,
+    PutListsIdItemsIdDTO
 } from './dto';
 import { ListService } from './list.service';
 import { ListIdParamPipe } from './pipes/list-id-param.pipe';
@@ -34,6 +36,18 @@ export class ListController {
         private readonly listService: ListService,
         private readonly userService: UserService
     ) {}
+
+    @Get()
+    @UseGuards(JwtGuard)
+    async getLists(
+        @ReqUser() reqUser: SerializedUser,
+        @Query() dto: GetListsDTO
+    ) {
+        return this.listService.findLists({
+            ...dto,
+            user_id: reqUser.role === 'ADMIN' ? undefined : reqUser.id
+        });
+    }
 
     @Post()
     @UseGuards(JwtGuard)
