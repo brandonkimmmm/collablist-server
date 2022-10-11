@@ -5,12 +5,12 @@ import { USER_ROLE } from 'src/shared/constants';
 import { NOT_AUTHORIZED_FOR_LIST } from 'src/shared/messages';
 import { SerializedUser } from 'src/shared/types/user.type';
 import {
-	GetListsDTO,
-	PostListsDTO,
-	PostListsIdItemsDTO,
-	PostListsIdMembersDTO,
-	PutListsIdDTO,
-	PutListsIdItemsIdDTO
+    GetListsDTO,
+    PostListsDTO,
+    PostListsIdItemsDTO,
+    PostListsIdMembersDTO,
+    PutListsIdDTO,
+    PutListsIdItemsIdDTO
 } from './dto';
 
 @Injectable()
@@ -143,12 +143,16 @@ export class ListService {
             select: {
                 id: true,
                 title: true,
+                description: true,
                 created_at: true,
                 updated_at: true,
                 user: {
                     select: {
                         id: true,
-                        email: true
+                        email: true,
+                        first_name: true,
+                        last_name: true,
+                        username: true
                     }
                 },
                 members: {
@@ -156,7 +160,10 @@ export class ListService {
                         user: {
                             select: {
                                 id: true,
-                                email: true
+                                email: true,
+                                first_name: true,
+                                last_name: true,
+                                username: true
                             }
                         }
                     }
@@ -184,12 +191,16 @@ export class ListService {
             select: {
                 id: true,
                 title: true,
+                description: true,
                 created_at: true,
                 updated_at: true,
                 user: {
                     select: {
                         id: true,
-                        email: true
+                        email: true,
+                        first_name: true,
+                        last_name: true,
+                        username: true
                     }
                 },
                 members: {
@@ -197,7 +208,10 @@ export class ListService {
                         user: {
                             select: {
                                 id: true,
-                                email: true
+                                email: true,
+                                first_name: true,
+                                last_name: true,
+                                username: true
                             }
                         }
                     }
@@ -224,12 +238,39 @@ export class ListService {
             select: {
                 id: true,
                 title: true,
+                description: true,
                 created_at: true,
                 updated_at: true,
                 user: {
                     select: {
                         id: true,
-                        email: true
+                        email: true,
+                        first_name: true,
+                        last_name: true,
+                        username: true
+                    }
+                },
+                members: {
+                    select: {
+                        user: {
+                            select: {
+                                id: true,
+                                email: true,
+                                first_name: true,
+                                last_name: true,
+                                username: true
+                            }
+                        }
+                    }
+                },
+                items: {
+                    select: {
+                        id: true,
+                        title: true,
+                        amount: true,
+                        status: true,
+                        created_at: true,
+                        updated_at: true
                     }
                 }
             }

@@ -1,7 +1,7 @@
 import {
-    ExceptionFilter,
-    Catch,
     ArgumentsHost,
+    Catch,
+    ExceptionFilter,
     HttpException,
     HttpStatus
 } from '@nestjs/common';
@@ -23,7 +23,10 @@ export class AllExceptionsFilter implements ExceptionFilter {
 
         const responseBody = {
             statusCode: httpStatus,
-            message: (exception as any).message || 'Internal server error',
+            message:
+                (exception as any).response?.message[0] ||
+                (exception as any).message ||
+                'Internal server error',
             timestamp: new Date().toISOString(),
             path: httpAdapter.getRequestUrl(ctx.getRequest())
         };

@@ -1,8 +1,7 @@
 import { Type } from 'class-transformer';
-import { IsInt, IsNumberString, IsPositive } from 'class-validator';
+import { IsInt, IsPositive } from 'class-validator';
 
 export class ParamListIdDTO {
-    @IsNumberString()
     @Type(() => Number)
     @IsInt()
     @IsPositive()
@@ -10,7 +9,6 @@ export class ParamListIdDTO {
 }
 
 export class ParamListItemIdDTO extends ParamListIdDTO {
-    @IsNumberString()
     @Type(() => Number)
     @IsInt()
     @IsPositive()
@@ -18,7 +16,6 @@ export class ParamListItemIdDTO extends ParamListIdDTO {
 }
 
 export class ParamListMemberIdDTO extends ParamListIdDTO {
-    @IsNumberString()
     @Type(() => Number)
     @IsInt()
     @IsPositive()
