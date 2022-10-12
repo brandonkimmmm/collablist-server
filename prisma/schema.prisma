@@ -51,7 +51,6 @@ model List {
 model ListItem {
     id         Int      @id @default(autoincrement())
     title      String   @db.VarChar(255)
-    amount     Float
     status     Boolean  @default(false)
     created_at DateTime @default(now())
     updated_at DateTime @updatedAt

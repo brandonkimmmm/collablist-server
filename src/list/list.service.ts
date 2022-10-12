@@ -119,7 +119,6 @@ export class ListService {
                         select: {
                             id: true,
                             title: true,
-                            amount: true,
                             status: true,
                             created_at: true,
                             updated_at: true
@@ -172,7 +171,6 @@ export class ListService {
                     select: {
                         id: true,
                         title: true,
-                        amount: true,
                         status: true,
                         created_at: true,
                         updated_at: true
@@ -220,7 +218,6 @@ export class ListService {
                     select: {
                         id: true,
                         title: true,
-                        amount: true,
                         status: true,
                         created_at: true,
                         updated_at: true
@@ -267,7 +264,6 @@ export class ListService {
                     select: {
                         id: true,
                         title: true,
-                        amount: true,
                         status: true,
                         created_at: true,
                         updated_at: true
@@ -277,10 +273,7 @@ export class ListService {
         });
     }
 
-    async createListItem(
-        listId: number,
-        { title, amount }: PostListsIdItemsDTO
-    ) {
+    async createListItem(listId: number, { title }: PostListsIdItemsDTO) {
         return this.prismaService.listItem.create({
             data: {
                 list: {
@@ -288,13 +281,11 @@ export class ListService {
                         id: listId
                     }
                 },
-                title,
-                amount
+                title
             },
             select: {
                 id: true,
                 title: true,
-                amount: true,
                 status: true,
                 created_at: true,
                 updated_at: true
@@ -304,7 +295,7 @@ export class ListService {
 
     async updateListItem(
         listItemId: number,
-        { title, amount, status }: PutListsIdItemsIdDTO
+        { title, status }: PutListsIdItemsIdDTO
     ) {
         return this.prismaService.listItem.update({
             where: {
@@ -312,13 +303,11 @@ export class ListService {
             },
             data: {
                 title,
-                amount,
                 status
             },
             select: {
                 id: true,
                 title: true,
-                amount: true,
                 status: true,
                 created_at: true,
                 updated_at: true
@@ -334,7 +323,6 @@ export class ListService {
             select: {
                 id: true,
                 title: true,
-                amount: true,
                 status: true,
                 created_at: true,
                 updated_at: true
