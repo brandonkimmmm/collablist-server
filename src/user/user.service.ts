@@ -3,6 +3,7 @@ import { Prisma } from '@prisma/client';
 import { difference } from 'lodash';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { USERS_NOT_FOUND } from 'src/shared/messages';
+import { GetUsersDTO } from './dto';
 
 @Injectable()
 export class UserService {
@@ -37,5 +38,48 @@ export class UserService {
         );
         if (notFoundIds.length > 0)
             throw new NotFoundException(USERS_NOT_FOUND(notFoundIds));
+    }
+
+    async findUsers({ limit, page, search }: GetUsersDTO) {
+        const whereArgs: Prisma.UserWhereInput = {};
+
+        if (search) {
+            whereArgs.OR = [
+                {
+                    first_name: {
+                        contains: search,
+                        mode: 'insensitive'
+                    },
+                    last_name: {
+                        contains: search,
+                        mode: 'insensitive'
+                    },
+                    email: {
+                        contains: search,
+                        mode: 'insensitive'
+                    }
+                }
+            ];
+        }
+        const [count, data] = await this.prismaService.$transaction([
+            this.prismaService.user.count({
+                where: whereArgs
+            }),
+            this.prismaService.user.findMany({
+                where: whereArgs,
+                orderBy: {
+                    created_at: 'desc'
+                },
+                ...this.prismaService.generatePaginationQuery(limit, page),
+                select: {
+                    id: true,
+                    email: true,
+                    first_name: true,
+                    last_name: true
+                }
+            })
+        ]);
+
+        return { count, data };
     }
 }
