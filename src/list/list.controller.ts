@@ -137,8 +137,7 @@ export class ListController {
     ) {
         await this.listService.authorizeReqUserList(list_id, reqUser);
         await this.userService.validateUserIds(dto.user_ids);
-        await this.listService.createListMembers(list_id, dto);
-        return this.listService.findListMembers(list_id);
+        return this.listService.createListMembers(list_id, dto);
     }
 
     @Delete(':list_id/members/:list_member_id')

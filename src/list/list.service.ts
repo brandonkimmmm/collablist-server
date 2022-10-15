@@ -99,7 +99,9 @@ export class ListService {
                             email: true,
                             first_name: true,
                             last_name: true,
-                            username: true
+                            username: true,
+                            created_at: true,
+                            updated_at: true
                         }
                     },
                     members: {
@@ -110,6 +112,8 @@ export class ListService {
                                     email: true,
                                     first_name: true,
                                     last_name: true,
+                                    created_at: true,
+                                    updated_at: true,
                                     username: true
                                 }
                             }
@@ -151,7 +155,9 @@ export class ListService {
                         email: true,
                         first_name: true,
                         last_name: true,
-                        username: true
+                        username: true,
+                        created_at: true,
+                        updated_at: true
                     }
                 },
                 members: {
@@ -162,6 +168,8 @@ export class ListService {
                                 email: true,
                                 first_name: true,
                                 last_name: true,
+                                created_at: true,
+                                updated_at: true,
                                 username: true
                             }
                         }
@@ -198,7 +206,9 @@ export class ListService {
                         email: true,
                         first_name: true,
                         last_name: true,
-                        username: true
+                        username: true,
+                        created_at: true,
+                        updated_at: true
                     }
                 },
                 members: {
@@ -209,6 +219,8 @@ export class ListService {
                                 email: true,
                                 first_name: true,
                                 last_name: true,
+                                created_at: true,
+                                updated_at: true,
                                 username: true
                             }
                         }
@@ -244,7 +256,9 @@ export class ListService {
                         email: true,
                         first_name: true,
                         last_name: true,
-                        username: true
+                        username: true,
+                        created_at: true,
+                        updated_at: true
                     }
                 },
                 members: {
@@ -255,6 +269,8 @@ export class ListService {
                                 email: true,
                                 first_name: true,
                                 last_name: true,
+                                created_at: true,
+                                updated_at: true,
                                 username: true
                             }
                         }
@@ -331,12 +347,35 @@ export class ListService {
     }
 
     async createListMembers(listId: number, dto: PostListsIdMembersDTO) {
-        return this.prismaService.membership.createMany({
+        await this.prismaService.membership.createMany({
             skipDuplicates: true,
             data: dto.user_ids.map((userId) => ({
                 list_id: listId,
                 user_id: userId
             }))
+        });
+        return this.prismaService.membership.findMany({
+            where: {
+                list_id: listId,
+                user: {
+                    id: {
+                        in: dto.user_ids
+                    }
+                }
+            },
+            select: {
+                user: {
+                    select: {
+                        id: true,
+                        email: true,
+                        first_name: true,
+                        last_name: true,
+                        created_at: true,
+                        updated_at: true,
+                        username: true
+                    }
+                }
+            }
         });
     }
 
@@ -349,7 +388,12 @@ export class ListService {
                 user: {
                     select: {
                         id: true,
-                        email: true
+                        email: true,
+                        first_name: true,
+                        last_name: true,
+                        created_at: true,
+                        updated_at: true,
+                        username: true
                     }
                 }
             }
@@ -368,7 +412,12 @@ export class ListService {
                 user: {
                     select: {
                         id: true,
-                        email: true
+                        email: true,
+                        first_name: true,
+                        last_name: true,
+                        created_at: true,
+                        updated_at: true,
+                        username: true
                     }
                 }
             }

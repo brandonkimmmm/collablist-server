@@ -40,8 +40,10 @@ export class UserService {
             throw new NotFoundException(USERS_NOT_FOUND(notFoundIds));
     }
 
-    async findUsers({ limit, page, search }: GetUsersDTO) {
-        const whereArgs: Prisma.UserWhereInput = {};
+    async findUsers({ limit, page, search, exclude_ids }: GetUsersDTO) {
+        const whereArgs: Prisma.UserWhereInput = {
+            role: 'USER'
+        };
 
         if (search) {
             whereArgs.OR = [
@@ -49,18 +51,35 @@ export class UserService {
                     first_name: {
                         contains: search,
                         mode: 'insensitive'
-                    },
+                    }
+                },
+                {
                     last_name: {
                         contains: search,
                         mode: 'insensitive'
-                    },
+                    }
+                },
+                {
                     email: {
+                        contains: search,
+                        mode: 'insensitive'
+                    }
+                },
+                {
+                    username: {
                         contains: search,
                         mode: 'insensitive'
                     }
                 }
             ];
         }
+
+        if (exclude_ids && exclude_ids.length > 0) {
+            whereArgs.id = {
+                notIn: exclude_ids
+            };
+        }
+
         const [count, data] = await this.prismaService.$transaction([
             this.prismaService.user.count({
                 where: whereArgs
@@ -75,7 +94,10 @@ export class UserService {
                     id: true,
                     email: true,
                     first_name: true,
-                    last_name: true
+                    last_name: true,
+                    username: true,
+                    created_at: true,
+                    updated_at: true
                 }
             })
         ]);

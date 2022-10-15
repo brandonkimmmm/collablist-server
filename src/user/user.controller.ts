@@ -15,6 +15,9 @@ export class UserController {
         @ReqUser() reqUser: SerializedUser,
         @Query() dto: GetUsersDTO
     ) {
+        if (dto.exclude_ids) {
+            await this.userService.validateUserIds(dto.exclude_ids);
+        }
         return this.userService.findUsers(dto);
     }
 }
