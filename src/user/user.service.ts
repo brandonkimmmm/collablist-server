@@ -21,11 +21,12 @@ export class UserService {
         return this.prismaService.user.create(args);
     }
 
-    async validateUserIds(ids: number[]) {
+    async validateUserIds(ids: number[], invalidIds: number[] = []) {
         const users = await this.prismaService.user.findMany({
             where: {
                 id: {
-                    in: ids
+                    in: ids,
+                    notIn: invalidIds
                 }
             },
             select: {

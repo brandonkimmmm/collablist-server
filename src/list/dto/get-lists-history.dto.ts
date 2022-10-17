@@ -1,8 +1,8 @@
-import { Expose, Type } from 'class-transformer';
+import { Expose, Transform, Type } from 'class-transformer';
 import { IsBoolean, IsInt, IsOptional, Max, Min } from 'class-validator';
 import Default from 'src/shared/decorators/default.decorator';
 
-export class GetListsDTO {
+export class GetListsHistoryDTO {
     @Expose()
     @Default(50)
     @Type(() => Number)
@@ -20,9 +20,8 @@ export class GetListsDTO {
 
     @IsOptional()
     @IsBoolean()
+    @Transform(({ value }) => {
+        return value === 'true';
+    })
     readonly is_owned?: boolean;
-
-    @IsOptional()
-    @IsBoolean()
-    readonly is_done?: boolean;
 }

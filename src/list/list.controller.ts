@@ -1,4 +1,5 @@
 import {
+    BadRequestException,
     Body,
     Controller,
     Delete,
@@ -10,12 +11,13 @@ import {
     UseGuards,
     UsePipes
 } from '@nestjs/common';
+import { isArray } from 'lodash';
 import { JwtGuard } from 'src/auth/jwt/jwt.guard';
 import { ReqUser } from 'src/shared/decorators/req-user.decorator';
 import { SerializedUser } from 'src/shared/types/user.type';
 import { UserService } from 'src/user/user.service';
 import {
-    GetListsDTO,
+    GetListsHistoryDTO,
     ParamListIdDTO,
     ParamListItemIdDTO,
     ParamListMemberIdDTO,
@@ -39,11 +41,17 @@ export class ListController {
 
     @Get()
     @UseGuards(JwtGuard)
-    async getLists(
+    async getLists(@ReqUser() reqUser: SerializedUser) {
+        return this.listService.findActiveLists(reqUser);
+    }
+
+    @Get('history')
+    @UseGuards(JwtGuard)
+    async getListsHistory(
         @ReqUser() reqUser: SerializedUser,
-        @Query() dto: GetListsDTO
+        @Query() dto: GetListsHistoryDTO
     ) {
-        return this.listService.findLists(dto, reqUser);
+        return this.listService.findListsHistory(dto, reqUser);
     }
 
     @Post()
@@ -52,6 +60,11 @@ export class ListController {
         @ReqUser() reqUser: SerializedUser,
         @Body() dto: PostListsDTO
     ) {
+        if (isArray(dto.member_ids)) {
+            await this.userService.validateUserIds(dto.member_ids, [
+                reqUser.id
+            ]);
+        }
         return this.listService.createList(dto, reqUser);
     }
 
@@ -121,6 +134,9 @@ export class ListController {
         @Param() { list_id, list_item_id }: ParamListItemIdDTO
     ) {
         await this.listService.authorizeReqUserList(list_id, reqUser);
+        const count = await this.listService.countListItems(list_id);
+        if (count === 1)
+            throw new BadRequestException('List must have at least one item');
         return this.listService.deleteListItem(list_item_id);
     }
 
@@ -133,7 +149,10 @@ export class ListController {
         @Body() dto: PostListsIdMembersDTO
     ) {
         await this.listService.authorizeReqUserList(list_id, reqUser);
-        await this.userService.validateUserIds(dto.user_ids);
+        await this.userService.validateUserIds(dto.user_ids, [
+            reqUser.id,
+            ...(await this.listService.findListMemberIds(list_id))
+        ]);
         return this.listService.createListMembers(list_id, dto);
     }
 

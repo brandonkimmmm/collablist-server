@@ -1,4 +1,4 @@
-export * from './get-lists.dto';
+export * from './get-lists-history.dto';
 export * from './param-id.dto';
 export * from './post-lists-id-items.dto';
 export * from './post-lists-id-members.dto';

@@ -6,7 +6,7 @@ import { USER_ROLE } from 'src/shared/constants';
 import { NOT_AUTHORIZED_FOR_LIST } from 'src/shared/messages';
 import { SerializedUser } from 'src/shared/types/user.type';
 import {
-    GetListsDTO,
+    GetListsHistoryDTO,
     PostListsDTO,
     PostListsIdItemsDTO,
     PostListsIdMembersDTO,
@@ -42,7 +42,7 @@ export class ListService {
     }
 
     async createList(
-        { title, description }: PostListsDTO,
+        { title, description, items, member_ids }: PostListsDTO,
         reqUser: SerializedUser
     ) {
         return this.prismaService.list.create({
@@ -53,19 +53,163 @@ export class ListService {
                     connect: {
                         id: reqUser.id
                     }
+                },
+                items: {
+                    createMany: {
+                        data: items
+                    }
+                },
+                members: {
+                    createMany: {
+                        data: member_ids
+                            ? member_ids.map((m) => ({
+                                  user_id: m
+                              }))
+                            : []
+                    }
+                }
+            },
+            select: {
+                id: true,
+                title: true,
+                description: true,
+                created_at: true,
+                updated_at: true,
+                user: {
+                    select: {
+                        id: true,
+                        email: true,
+                        first_name: true,
+                        last_name: true,
+                        username: true,
+                        created_at: true,
+                        updated_at: true
+                    }
+                },
+                members: {
+                    select: {
+                        user: {
+                            select: {
+                                id: true,
+                                email: true,
+                                first_name: true,
+                                last_name: true,
+                                created_at: true,
+                                updated_at: true,
+                                username: true
+                            }
+                        }
+                    }
+                },
+                items: {
+                    select: {
+                        id: true,
+                        title: true,
+                        status: true,
+                        created_at: true,
+                        updated_at: true
+                    }
                 }
             }
         });
     }
 
-    async findLists(
-        { limit, page, is_owned, is_done }: GetListsDTO,
-        reqUser: SerializedUser
-    ) {
-        const whereArgs: Prisma.ListWhereInput = {};
+    async findActiveLists(reqUser: SerializedUser) {
+        const whereArgs: Prisma.ListWhereInput = {
+            items: {
+                some: {
+                    status: false
+                }
+            }
+        };
 
         if (reqUser.role !== 'ADMIN') {
-            if (!isBoolean(is_owned)) {
+            whereArgs.OR = [
+                { user_id: reqUser.id },
+                {
+                    members: {
+                        some: {
+                            user_id: reqUser.id
+                        }
+                    }
+                }
+            ];
+        }
+
+        return this.prismaService.list.findMany({
+            where: whereArgs,
+            orderBy: {
+                created_at: 'desc'
+            },
+            select: {
+                id: true,
+                title: true,
+                description: true,
+                created_at: true,
+                updated_at: true,
+                user: {
+                    select: {
+                        id: true,
+                        email: true,
+                        first_name: true,
+                        last_name: true,
+                        username: true,
+                        created_at: true,
+                        updated_at: true
+                    }
+                },
+                members: {
+                    select: {
+                        user: {
+                            select: {
+                                id: true,
+                                email: true,
+                                first_name: true,
+                                last_name: true,
+                                created_at: true,
+                                updated_at: true,
+                                username: true
+                            }
+                        }
+                    }
+                },
+                items: {
+                    select: {
+                        id: true,
+                        title: true,
+                        status: true,
+                        created_at: true,
+                        updated_at: true
+                    }
+                }
+            }
+        });
+    }
+
+    async findListsHistory(
+        { is_owned, limit, page }: GetListsHistoryDTO,
+        reqUser: SerializedUser
+    ) {
+        const whereArgs: Prisma.ListWhereInput = {
+            items: {
+                none: {
+                    status: false
+                }
+            }
+        };
+
+        if (reqUser.role !== 'ADMIN') {
+            if (isBoolean(is_owned)) {
+                if (is_owned) {
+                    whereArgs.user_id = reqUser.id;
+                } else {
+                    whereArgs.members = {
+                        some: {
+                            user_id: reqUser.id
+                        }
+                    };
+                }
+            } else {
                 whereArgs.OR = [
                     { user_id: reqUser.id },
                     {
@@ -76,25 +220,7 @@ export class ListService {
                         }
                     }
                 ];
-            } else {
-                if (is_done) {
-                    whereArgs.user_id = reqUser.id;
-                } else {
-                    whereArgs.members = {
-                        some: {
-                            user_id: reqUser.id
-                        }
-                    };
-                }
             }
-        }
-
-        if (isBoolean(is_done)) {
-            whereArgs.items = {
-                [is_done ? 'none' : 'some']: {
-                    status: false
-                }
-            };
         }
 
         const [count, data] = await this.prismaService.$transaction([
@@ -152,10 +278,7 @@ export class ListService {
             })
         ]);
 
-        return {
-            count,
-            data
-        };
+        return { count, data };
     }
 
     async findList(listId: number) {
@@ -351,6 +474,14 @@ export class ListService {
         });
     }
 
+    async countListItems(listId: number) {
+        return this.prismaService.listItem.count({
+            where: {
+                list_id: listId
+            }
+        });
+    }
+
     async deleteListItem(listItemId: number) {
         return this.prismaService.listItem.delete({
             where: {
@@ -442,5 +573,17 @@ export class ListService {
                 }
             }
         });
+    }
+
+    async findListMemberIds(listId: number) {
+        const data = await this.prismaService.membership.findMany({
+            where: {
+                list_id: listId
+            },
+            select: {
+                user_id: true
+            }
+        });
+        return data.map((d) => d.user_id);
     }
 }
