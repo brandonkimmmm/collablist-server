@@ -6,6 +6,7 @@ import {
     HttpStatus
 } from '@nestjs/common';
 import { HttpAdapterHost } from '@nestjs/core';
+import { Prisma } from '@prisma/client';
 import { isArray } from 'lodash';
 
 @Catch()
@@ -17,10 +18,15 @@ export class AllExceptionsFilter implements ExceptionFilter {
 
         const ctx = host.switchToHttp();
 
-        const httpStatus =
-            exception instanceof HttpException
-                ? exception.getStatus()
-                : HttpStatus.INTERNAL_SERVER_ERROR;
+        let httpStatus: number;
+
+        if (exception instanceof HttpException) {
+            httpStatus = exception.getStatus();
+        } else if (exception instanceof Prisma.NotFoundError) {
+            httpStatus = HttpStatus.NOT_FOUND;
+        } else {
+            httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
+        }
 
         const responseBody = {
             statusCode: httpStatus,
