@@ -1,4 +1,9 @@
-import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
+import {
+    BadRequestException,
+    Injectable,
+    Logger,
+    UnauthorizedException
+} from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { isBoolean } from 'lodash';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -74,6 +79,7 @@ export class ListService {
                 title: true,
                 description: true,
                 created_at: true,
+                is_complete: true,
                 updated_at: true,
                 user: {
                     select: {
@@ -116,11 +122,7 @@ export class ListService {
 
     async findActiveLists(reqUser: SerializedUser) {
         const whereArgs: Prisma.ListWhereInput = {
-            items: {
-                some: {
-                    status: false
-                }
-            }
+            is_complete: false
         };
 
         if (reqUser.role !== 'ADMIN') {
@@ -146,6 +148,7 @@ export class ListService {
                 title: true,
                 description: true,
                 created_at: true,
+                is_complete: true,
                 updated_at: true,
                 user: {
                     select: {
@@ -191,11 +194,7 @@ export class ListService {
         reqUser: SerializedUser
     ) {
         const whereArgs: Prisma.ListWhereInput = {
-            items: {
-                none: {
-                    status: false
-                }
-            }
+            is_complete: true
         };
 
         if (reqUser.role !== 'ADMIN') {
@@ -238,6 +237,7 @@ export class ListService {
                     title: true,
                     description: true,
                     created_at: true,
+                    is_complete: true,
                     updated_at: true,
                     user: {
                         select: {
@@ -291,6 +291,7 @@ export class ListService {
                 title: true,
                 description: true,
                 created_at: true,
+                is_complete: true,
                 updated_at: true,
                 user: {
                     select: {
@@ -342,6 +343,7 @@ export class ListService {
                 title: true,
                 description: true,
                 created_at: true,
+                is_complete: true,
                 updated_at: true,
                 user: {
                     select: {
@@ -391,6 +393,7 @@ export class ListService {
                 id: true,
                 title: true,
                 description: true,
+                is_complete: true,
                 created_at: true,
                 updated_at: true,
                 user: {
@@ -585,5 +588,18 @@ export class ListService {
             }
         });
         return data.map((d) => d.user_id);
+    }
+
+    async validateUpdateList(listId: number) {
+        const list = await this.prismaService.list.findFirstOrThrow({
+            where: {
+                id: listId
+            },
+            select: {
+                is_complete: true
+            }
+        });
+        if (list.is_complete)
+            throw new BadRequestException('Cannot update complete list');
     }
 }

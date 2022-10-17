@@ -1,4 +1,10 @@
-import { IsNotEmpty, IsOptional, IsString, ValidateIf } from 'class-validator';
+import {
+    IsBoolean,
+    IsNotEmpty,
+    IsOptional,
+    IsString,
+    ValidateIf
+} from 'class-validator';
 
 export class PutListsIdDTO {
     @IsOptional()
@@ -12,4 +18,8 @@ export class PutListsIdDTO {
     @IsNotEmpty()
     @ValidateIf((o) => !o.title || o.description)
     readonly description?: string;
+
+    @IsOptional()
+    @IsBoolean()
+    readonly is_complete?: boolean;
 }

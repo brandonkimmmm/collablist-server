@@ -88,6 +88,7 @@ export class ListController {
         @Body() dto: PutListsIdDTO
     ) {
         await this.listService.authorizeReqUserList(list_id, reqUser);
+        await this.listService.validateUpdateList(list_id);
         return this.listService.updateList(list_id, dto);
     }
 
@@ -99,6 +100,7 @@ export class ListController {
         @Param() { list_id }: ParamListIdDTO
     ) {
         await this.listService.authorizeReqUserList(list_id, reqUser);
+        await this.listService.validateUpdateList(list_id);
         return this.listService.deleteList(list_id);
     }
 
@@ -111,6 +113,7 @@ export class ListController {
         @Body() dto: PostListsIdItemsDTO
     ) {
         await this.listService.authorizeReqUserList(list_id, reqUser);
+        await this.listService.validateUpdateList(list_id);
         return this.listService.createListItem(list_id, dto);
     }
 
@@ -123,6 +126,7 @@ export class ListController {
         @Body() dto: PutListsIdItemsIdDTO
     ) {
         await this.listService.authorizeReqUserList(list_id, reqUser);
+        await this.listService.validateUpdateList(list_id);
         return this.listService.updateListItem(list_item_id, dto);
     }
 
@@ -134,6 +138,7 @@ export class ListController {
         @Param() { list_id, list_item_id }: ParamListItemIdDTO
     ) {
         await this.listService.authorizeReqUserList(list_id, reqUser);
+        await this.listService.validateUpdateList(list_id);
         const count = await this.listService.countListItems(list_id);
         if (count === 1)
             throw new BadRequestException('List must have at least one item');
@@ -149,6 +154,7 @@ export class ListController {
         @Body() dto: PostListsIdMembersDTO
     ) {
         await this.listService.authorizeReqUserList(list_id, reqUser);
+        await this.listService.validateUpdateList(list_id);
         await this.userService.validateUserIds(dto.user_ids, [
             reqUser.id,
             ...(await this.listService.findListMemberIds(list_id))
@@ -164,6 +170,7 @@ export class ListController {
         @Param() { list_id, list_member_id }: ParamListMemberIdDTO
     ) {
         await this.listService.authorizeReqUserList(list_id, reqUser);
+        await this.listService.validateUpdateList(list_id);
         return this.listService.deleteListMember(list_id, list_member_id);
     }
 }
