@@ -89,7 +89,9 @@ export class ListController {
         @Param() { list_id }: ParamListIdDTO,
         @Body() dto: PutListsIdDTO
     ) {
-        await this.listService.authorizeReqUserList(list_id, reqUser);
+        await this.listService.authorizeReqUserList(list_id, reqUser, {
+            is_owner: true
+        });
         await this.listService.validateUpdateList(list_id);
         return this.listService.updateList(list_id, dto);
     }
@@ -101,7 +103,9 @@ export class ListController {
         @ReqUser() reqUser: SerializedUser,
         @Param() { list_id }: ParamListIdDTO
     ) {
-        await this.listService.authorizeReqUserList(list_id, reqUser);
+        await this.listService.authorizeReqUserList(list_id, reqUser, {
+            is_owner: true
+        });
         await this.listService.validateUpdateList(list_id);
         return this.listService.deleteList(list_id);
     }

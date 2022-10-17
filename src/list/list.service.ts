@@ -25,7 +25,11 @@ export class ListService {
 
     constructor(private readonly prismaService: PrismaService) {}
 
-    async authorizeReqUserList(listId: number, reqUser: SerializedUser) {
+    async authorizeReqUserList(
+        listId: number,
+        reqUser: SerializedUser,
+        opts: { is_owner?: boolean } = { is_owner: false }
+    ) {
         const list = await this.prismaService.list.findUniqueOrThrow({
             where: { id: listId },
             select: {
@@ -38,9 +42,10 @@ export class ListService {
             }
         });
         if (
-            reqUser.role !== USER_ROLE.ADMIN &&
-            list.user_id !== reqUser.id &&
-            !list.members.find((m) => m.user_id === reqUser.id)
+            reqUser.role !== USER_ROLE.ADMIN && opts.is_owner
+                ? list.user_id !== reqUser.id
+                : list.user_id !== reqUser.id &&
+                  !list.members.find((m) => m.user_id === reqUser.id)
         ) {
             throw new UnauthorizedException(NOT_AUTHORIZED_FOR_LIST);
         }
