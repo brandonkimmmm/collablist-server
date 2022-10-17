@@ -602,4 +602,18 @@ export class ListService {
         if (list.is_complete)
             throw new BadRequestException('Cannot update complete list');
     }
+
+    async validateUserListNumber(userId: number) {
+        const count = await this.prismaService.list.count({
+            where: {
+                user_id: userId,
+                is_complete: false
+            }
+        });
+
+        if (count >= 10)
+            throw new BadRequestException(
+                'Cannot have more than 10 active lists'
+            );
+    }
 }

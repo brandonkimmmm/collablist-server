@@ -60,6 +60,8 @@ export class ListController {
         @ReqUser() reqUser: SerializedUser,
         @Body() dto: PostListsDTO
     ) {
+        if (reqUser.role !== 'ADMIN')
+            await this.listService.validateUserListNumber(reqUser.id);
         if (isArray(dto.member_ids)) {
             await this.userService.validateUserIds(dto.member_ids, [
                 reqUser.id
