@@ -94,6 +94,7 @@ export class ListService {
                         last_name: true,
                         username: true,
                         created_at: true,
+                        avatar_url: true,
                         updated_at: true
                     }
                 },
@@ -106,6 +107,7 @@ export class ListService {
                                 first_name: true,
                                 last_name: true,
                                 created_at: true,
+                                avatar_url: true,
                                 updated_at: true,
                                 username: true
                             }
@@ -162,6 +164,7 @@ export class ListService {
                         first_name: true,
                         last_name: true,
                         username: true,
+                        avatar_url: true,
                         created_at: true,
                         updated_at: true
                     }
@@ -173,6 +176,7 @@ export class ListService {
                                 id: true,
                                 email: true,
                                 first_name: true,
+                                avatar_url: true,
                                 last_name: true,
                                 created_at: true,
                                 updated_at: true,
@@ -249,6 +253,7 @@ export class ListService {
                             id: true,
                             email: true,
                             first_name: true,
+                            avatar_url: true,
                             last_name: true,
                             username: true,
                             created_at: true,
@@ -263,6 +268,7 @@ export class ListService {
                                     email: true,
                                     first_name: true,
                                     last_name: true,
+                                    avatar_url: true,
                                     created_at: true,
                                     updated_at: true,
                                     username: true
@@ -304,6 +310,7 @@ export class ListService {
                         email: true,
                         first_name: true,
                         last_name: true,
+                        avatar_url: true,
                         username: true,
                         created_at: true,
                         updated_at: true
@@ -316,6 +323,7 @@ export class ListService {
                                 id: true,
                                 email: true,
                                 first_name: true,
+                                avatar_url: true,
                                 last_name: true,
                                 created_at: true,
                                 updated_at: true,
@@ -355,6 +363,7 @@ export class ListService {
                         id: true,
                         email: true,
                         first_name: true,
+                        avatar_url: true,
                         last_name: true,
                         username: true,
                         created_at: true,
@@ -369,6 +378,7 @@ export class ListService {
                                 email: true,
                                 first_name: true,
                                 last_name: true,
+                                avatar_url: true,
                                 created_at: true,
                                 updated_at: true,
                                 username: true
@@ -407,6 +417,7 @@ export class ListService {
                         email: true,
                         first_name: true,
                         last_name: true,
+                        avatar_url: true,
                         username: true,
                         created_at: true,
                         updated_at: true
@@ -420,6 +431,7 @@ export class ListService {
                                 email: true,
                                 first_name: true,
                                 last_name: true,
+                                avatar_url: true,
                                 created_at: true,
                                 updated_at: true,
                                 username: true
@@ -527,6 +539,7 @@ export class ListService {
                     select: {
                         id: true,
                         email: true,
+                        avatar_url: true,
                         first_name: true,
                         last_name: true,
                         created_at: true,
@@ -551,6 +564,7 @@ export class ListService {
                         first_name: true,
                         last_name: true,
                         created_at: true,
+                        avatar_url: true,
                         updated_at: true,
                         username: true
                     }
@@ -574,6 +588,7 @@ export class ListService {
                         email: true,
                         first_name: true,
                         last_name: true,
+                        avatar_url: true,
                         created_at: true,
                         updated_at: true,
                         username: true

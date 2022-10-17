@@ -3,7 +3,7 @@ import { Prisma } from '@prisma/client';
 import { difference } from 'lodash';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { USERS_NOT_FOUND } from 'src/shared/messages';
-import { GetUsersDTO } from './dto';
+import { GetUsersDTO, PutUsersIdDTO } from './dto';
 
 @Injectable()
 export class UserService {
@@ -94,6 +94,7 @@ export class UserService {
                 select: {
                     id: true,
                     email: true,
+                    avatar_url: true,
                     first_name: true,
                     last_name: true,
                     username: true,
@@ -104,5 +105,22 @@ export class UserService {
         ]);
 
         return { count, data };
+    }
+
+    async updateUser(userId: number, dto: PutUsersIdDTO) {
+        return this.prismaService.user.update({
+            where: { id: userId },
+            data: dto,
+            select: {
+                id: true,
+                email: true,
+                first_name: true,
+                avatar_url: true,
+                last_name: true,
+                username: true,
+                created_at: true,
+                updated_at: true
+            }
+        });
     }
 }

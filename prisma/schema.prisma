@@ -26,6 +26,7 @@ model User {
     first_name  String       @db.VarChar(255)
     last_name   String       @db.VarChar(255)
     role        Role         @default(USER)
+    avatar_url  String?      @db.VarChar(255)
     created_at  DateTime     @default(now())
     updated_at  DateTime     @updatedAt
     lists       List[]
