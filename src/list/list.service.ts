@@ -1,5 +1,6 @@
 import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
+import { isBoolean } from 'lodash';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { USER_ROLE } from 'src/shared/constants';
 import { NOT_AUTHORIZED_FOR_LIST } from 'src/shared/messages';
@@ -41,8 +42,8 @@ export class ListService {
     }
 
     async createList(
-        reqUser: SerializedUser,
-        { title, description }: PostListsDTO
+        { title, description }: PostListsDTO,
+        reqUser: SerializedUser
     ) {
         return this.prismaService.list.create({
             data: {
@@ -57,24 +58,43 @@ export class ListService {
         });
     }
 
-    async findLists({
-        limit,
-        page,
-        user_id
-    }: GetListsDTO & { user_id?: number }) {
+    async findLists(
+        { limit, page, is_owned, is_done }: GetListsDTO,
+        reqUser: SerializedUser
+    ) {
         const whereArgs: Prisma.ListWhereInput = {};
 
-        if (user_id) {
-            whereArgs.OR = [
-                { user_id },
-                {
-                    members: {
-                        some: {
-                            user_id
+        if (reqUser.role !== 'ADMIN') {
+            if (!isBoolean(is_owned)) {
+                whereArgs.OR = [
+                    { user_id: reqUser.id },
+                    {
+                        members: {
+                            some: {
+                                user_id: reqUser.id
+                            }
                         }
                     }
+                ];
+            } else {
+                if (is_done) {
+                    whereArgs.user_id = reqUser.id;
+                } else {
+                    whereArgs.members = {
+                        some: {
+                            user_id: reqUser.id
+                        }
+                    };
                 }
-            ];
+            }
+        }
+
+        if (isBoolean(is_done)) {
+            whereArgs.items = {
+                [is_done ? 'none' : 'some']: {
+                    status: false
+                }
+            };
         }
 
         const [count, data] = await this.prismaService.$transaction([

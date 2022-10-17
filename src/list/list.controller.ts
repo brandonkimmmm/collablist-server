@@ -43,10 +43,7 @@ export class ListController {
         @ReqUser() reqUser: SerializedUser,
         @Query() dto: GetListsDTO
     ) {
-        return this.listService.findLists({
-            ...dto,
-            user_id: reqUser.role === 'ADMIN' ? undefined : reqUser.id
-        });
+        return this.listService.findLists(dto, reqUser);
     }
 
     @Post()
@@ -55,7 +52,7 @@ export class ListController {
         @ReqUser() reqUser: SerializedUser,
         @Body() dto: PostListsDTO
     ) {
-        return this.listService.createList(reqUser, dto);
+        return this.listService.createList(dto, reqUser);
     }
 
     @Get(':list_id')

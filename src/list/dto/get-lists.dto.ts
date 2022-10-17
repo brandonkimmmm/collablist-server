@@ -1,5 +1,5 @@
 import { Expose, Type } from 'class-transformer';
-import { IsInt, Max, Min } from 'class-validator';
+import { IsBoolean, IsInt, IsOptional, Max, Min } from 'class-validator';
 import Default from 'src/shared/decorators/default.decorator';
 
 export class GetListsDTO {
@@ -17,4 +17,12 @@ export class GetListsDTO {
     @IsInt()
     @Min(1)
     readonly page: number;
+
+    @IsOptional()
+    @IsBoolean()
+    readonly is_owned?: boolean;
+
+    @IsOptional()
+    @IsBoolean()
+    readonly is_done?: boolean;
 }
