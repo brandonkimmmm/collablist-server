@@ -2,6 +2,7 @@ import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { difference } from 'lodash';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { USER_ROLE } from 'src/shared/constants';
 import { USERS_NOT_FOUND } from 'src/shared/messages';
 import { GetUsersDTO, PutUsersIdDTO } from './dto';
 
@@ -43,33 +44,29 @@ export class UserService {
 
     async findUsers({ limit, page, search, exclude_ids }: GetUsersDTO) {
         const whereArgs: Prisma.UserWhereInput = {
-            role: 'USER'
+            role: USER_ROLE.USER
         };
 
         if (search) {
             whereArgs.OR = [
                 {
                     first_name: {
-                        contains: search,
-                        mode: 'insensitive'
+                        contains: search
                     }
                 },
                 {
                     last_name: {
-                        contains: search,
-                        mode: 'insensitive'
+                        contains: search
                     }
                 },
                 {
                     email: {
-                        contains: search,
-                        mode: 'insensitive'
+                        contains: search
                     }
                 },
                 {
                     username: {
-                        contains: search,
-                        mode: 'insensitive'
+                        contains: search
                     }
                 }
             ];

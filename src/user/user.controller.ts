@@ -10,6 +10,7 @@ import {
     UsePipes
 } from '@nestjs/common';
 import { JwtGuard } from 'src/auth/jwt/jwt.guard';
+import { USER_ROLE } from 'src/shared/constants';
 import { ReqUser } from 'src/shared/decorators/req-user.decorator';
 import { SerializedUser } from 'src/shared/types/user.type';
 import { GetUsersDTO, ParamUserIdDTO, PutUsersIdDTO } from './dto';
@@ -40,7 +41,7 @@ export class UserController {
         @Param() { user_id }: ParamUserIdDTO,
         @Body() dto: PutUsersIdDTO
     ) {
-        if (reqUser.role !== 'ADMIN' && user_id !== reqUser.id) {
+        if (reqUser.role !== USER_ROLE.ADMIN && user_id !== reqUser.id) {
             throw new UnauthorizedException('Cannot update another user');
         }
         return this.userService.updateUser(user_id, dto);

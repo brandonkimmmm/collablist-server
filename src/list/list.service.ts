@@ -55,75 +55,85 @@ export class ListService {
         { title, description, items, member_ids }: PostListsDTO,
         reqUser: SerializedUser
     ) {
-        return this.prismaService.list.create({
-            data: {
-                title,
-                description,
-                user: {
-                    connect: {
-                        id: reqUser.id
-                    }
-                },
-                items: {
-                    createMany: {
-                        data: items
-                    }
-                },
-                members: {
-                    createMany: {
-                        data: member_ids
-                            ? member_ids.map((m) => ({
-                                  user_id: m
-                              }))
-                            : []
-                    }
-                }
-            },
-            select: {
-                id: true,
-                title: true,
-                description: true,
-                created_at: true,
-                is_complete: true,
-                updated_at: true,
-                user: {
-                    select: {
-                        id: true,
-                        email: true,
-                        first_name: true,
-                        last_name: true,
-                        username: true,
-                        created_at: true,
-                        avatar_url: true,
-                        updated_at: true
-                    }
-                },
-                members: {
-                    select: {
-                        user: {
-                            select: {
-                                id: true,
-                                email: true,
-                                first_name: true,
-                                last_name: true,
-                                created_at: true,
-                                avatar_url: true,
-                                updated_at: true,
-                                username: true
-                            }
+        return this.prismaService.$transaction(async (prisma) => {
+            const list = await prisma.list.create({
+                data: {
+                    title,
+                    description,
+                    user: {
+                        connect: {
+                            id: reqUser.id
                         }
                     }
-                },
-                items: {
-                    select: {
-                        id: true,
-                        title: true,
-                        status: true,
-                        created_at: true,
-                        updated_at: true
+                }
+            });
+
+            for (const item of items) {
+                await prisma.listItem.create({
+                    data: {
+                        list_id: list.id,
+                        ...item
+                    }
+                });
+            }
+
+            for (const member of member_ids) {
+                await prisma.membership.create({
+                    data: {
+                        list_id: list.id,
+                        user_id: member
+                    }
+                });
+            }
+
+            return this.prismaService.list.findUnique({
+                where: { id: list.id },
+                select: {
+                    id: true,
+                    title: true,
+                    description: true,
+                    created_at: true,
+                    is_complete: true,
+                    updated_at: true,
+                    user: {
+                        select: {
+                            id: true,
+                            email: true,
+                            first_name: true,
+                            last_name: true,
+                            username: true,
+                            avatar_url: true,
+                            created_at: true,
+                            updated_at: true
+                        }
+                    },
+                    members: {
+                        select: {
+                            user: {
+                                select: {
+                                    id: true,
+                                    email: true,
+                                    first_name: true,
+                                    avatar_url: true,
+                                    last_name: true,
+                                    created_at: true,
+                                    updated_at: true,
+                                    username: true
+                                }
+                            }
+                        }
+                    },
+                    items: {
+                        select: {
+                            id: true,
+                            title: true,
+                            status: true,
+                            created_at: true,
+                            updated_at: true
+                        }
                     }
                 }
-            }
+            });
         });
     }
 
@@ -132,7 +142,7 @@ export class ListService {
             is_complete: false
         };
 
-        if (reqUser.role !== 'ADMIN') {
+        if (reqUser.role !== USER_ROLE.ADMIN) {
             whereArgs.OR = [
                 { user_id: reqUser.id },
                 {
@@ -206,7 +216,7 @@ export class ListService {
             is_complete: true
         };
 
-        if (reqUser.role !== 'ADMIN') {
+        if (reqUser.role !== USER_ROLE.ADMIN) {
             if (isBoolean(is_owned)) {
                 if (is_owned) {
                     whereArgs.user_id = reqUser.id;
@@ -518,36 +528,40 @@ export class ListService {
     }
 
     async createListMembers(listId: number, dto: PostListsIdMembersDTO) {
-        await this.prismaService.membership.createMany({
-            skipDuplicates: true,
-            data: dto.user_ids.map((userId) => ({
-                list_id: listId,
-                user_id: userId
-            }))
-        });
-        return this.prismaService.membership.findMany({
-            where: {
-                list_id: listId,
-                user: {
-                    id: {
-                        in: dto.user_ids
+        return this.prismaService.$transaction(async (prisma) => {
+            for (const userId of dto.user_ids) {
+                await prisma.membership.create({
+                    data: {
+                        list_id: listId,
+                        user_id: userId
                     }
-                }
-            },
-            select: {
-                user: {
-                    select: {
-                        id: true,
-                        email: true,
-                        avatar_url: true,
-                        first_name: true,
-                        last_name: true,
-                        created_at: true,
-                        updated_at: true,
-                        username: true
-                    }
-                }
+                });
             }
+
+            return prisma.membership.findMany({
+                where: {
+                    list_id: listId,
+                    user: {
+                        id: {
+                            in: dto.user_ids
+                        }
+                    }
+                },
+                select: {
+                    user: {
+                        select: {
+                            id: true,
+                            email: true,
+                            avatar_url: true,
+                            first_name: true,
+                            last_name: true,
+                            created_at: true,
+                            updated_at: true,
+                            username: true
+                        }
+                    }
+                }
+            });
         });
     }
 

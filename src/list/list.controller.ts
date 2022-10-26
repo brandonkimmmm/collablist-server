@@ -13,6 +13,7 @@ import {
 } from '@nestjs/common';
 import { isArray } from 'lodash';
 import { JwtGuard } from 'src/auth/jwt/jwt.guard';
+import { USER_ROLE } from 'src/shared/constants';
 import { ReqUser } from 'src/shared/decorators/req-user.decorator';
 import { SerializedUser } from 'src/shared/types/user.type';
 import { UserService } from 'src/user/user.service';
@@ -60,7 +61,7 @@ export class ListController {
         @ReqUser() reqUser: SerializedUser,
         @Body() dto: PostListsDTO
     ) {
-        if (reqUser.role !== 'ADMIN')
+        if (reqUser.role !== USER_ROLE.ADMIN)
             await this.listService.validateUserListNumber(reqUser.id);
         if (isArray(dto.member_ids)) {
             await this.userService.validateUserIds(dto.member_ids, [

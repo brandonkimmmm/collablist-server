@@ -6,6 +6,5 @@ export default () => ({
         SECRET: process.env.JWT_SECRET || 'shhh',
         EXPIRES_IN: process.env.JWT_EXPIRES_IN || '24h'
     },
-    DATABASE_URL: process.env.DATABASE_URL,
     GLOBAL_PREFIX: 'v1'
 });

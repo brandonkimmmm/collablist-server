@@ -6,8 +6,7 @@
 	"private": true,
 	"license": "UNLICENSED",
 	"prisma": {
-		"seed": "ts-node prisma/seeders/index.ts",
-		"seed:dummy": "ts-node prisma/seeders/dummy.ts"
+		"seed": "ts-node prisma/seeders/index.ts"
 	},
 	"scripts": {
 		"prebuild": "rimraf dist",
@@ -50,7 +49,8 @@
 		"pino-pretty": "^8.1.0",
 		"reflect-metadata": "^0.1.13",
 		"rimraf": "^3.0.2",
-		"rxjs": "^7.2.0"
+		"rxjs": "^7.2.0",
+		"sqlite3": "^5.1.2"
 	},
 	"devDependencies": {
 		"@faker-js/faker": "^7.5.0",

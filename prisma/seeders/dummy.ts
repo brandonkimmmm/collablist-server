@@ -6,13 +6,11 @@ const prisma = new PrismaClient();
 
 (async () => {
     try {
-        console.log('Seeding Users');
-
         const userIds: number[] = [];
 
         for (let i = 0; i < 20; i++) {
-            const email = faker.internet.email();
-            const password = 'asdfasdf1234';
+            const email = i === 0 ? 'user@example.com' : faker.internet.email();
+            const password = 'ASDFasdf1234!';
             const first_name = faker.name.firstName();
             const last_name = faker.name.lastName();
             const username = email.split('@')[0];
@@ -38,7 +36,71 @@ const prisma = new PrismaClient();
             userIds.push(user.id);
         }
 
-        console.log('Seeder finsihed');
+        for (let i = 0; i < 5; i++) {
+            const userId = userIds[0];
+
+            const list = await prisma.list.create({
+                data: {
+                    title: faker.random.words(3),
+                    description: faker.lorem.sentence(),
+                    user_id: userId,
+                    is_complete: i === 4
+                }
+            });
+
+            for (let i = 0; i < 5; i++) {
+                await prisma.listItem.create({
+                    data: {
+                        list_id: list.id,
+                        title: faker.random.words(2),
+                        status: faker.datatype.boolean()
+                    }
+                });
+            }
+
+            const memberIds = userIds.slice(
+                faker.datatype.number({ min: 1, max: userIds.length - 1 })
+            );
+            for (const member of memberIds) {
+                await prisma.membership.create({
+                    data: {
+                        list_id: list.id,
+                        user_id: member
+                    }
+                });
+            }
+        }
+
+        const randomUserIds = userIds.slice(
+            faker.datatype.number({ min: 1, max: userIds.length - 3 })
+        );
+
+        for (const userId of randomUserIds) {
+            const list = await prisma.list.create({
+                data: {
+                    title: faker.random.words(3),
+                    description: faker.lorem.sentence(),
+                    user_id: userId
+                }
+            });
+
+            for (let i = 0; i < 5; i++) {
+                await prisma.listItem.create({
+                    data: {
+                        list_id: list.id,
+                        title: faker.random.words(2),
+                        status: faker.datatype.boolean()
+                    }
+                });
+            }
+
+            await prisma.membership.create({
+                data: {
+                    list_id: list.id,
+                    user_id: userIds[0]
+                }
+            });
+        }
     } catch (err) {
         console.error(err);
     }

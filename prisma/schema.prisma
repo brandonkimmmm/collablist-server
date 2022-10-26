@@ -2,31 +2,25 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-    provider      = "prisma-client-js"
-    binaryTargets = ["native", "debian-openssl-1.1.x", "debian-openssl-3.0.x"]
+    provider        = "prisma-client-js"
+    binaryTargets   = ["native", "debian-openssl-1.1.x", "debian-openssl-3.0.x"]
+    previewFeatures = ["interactiveTransactions"]
 }
 
 datasource db {
-    provider = "postgresql"
-    url      = env("DATABASE_URL")
-}
-
-enum Role {
-    USER  @map("user")
-    ADMIN @map("admin")
-
-    @@map("_role")
+    provider = "sqlite"
+    url      = "file:./data.db"
 }
 
 model User {
     id          Int          @id @default(autoincrement())
-    email       String       @unique @db.VarChar(255)
-    username    String       @db.VarChar(255)
-    password    String       @db.VarChar(255)
-    first_name  String       @db.VarChar(255)
-    last_name   String       @db.VarChar(255)
-    role        Role         @default(USER)
-    avatar_url  String?      @db.VarChar(255)
+    email       String       @unique
+    username    String
+    role        String       @default("USER")
+    first_name  String
+    password    String
+    last_name   String
+    avatar_url  String?
     created_at  DateTime     @default(now())
     updated_at  DateTime     @updatedAt
     lists       List[]
@@ -37,8 +31,8 @@ model User {
 
 model List {
     id          Int          @id @default(autoincrement())
-    title       String       @db.VarChar(255)
-    description String       @db.VarChar(255)
+    title       String
+    description String
     is_complete Boolean      @default(false)
     created_at  DateTime     @default(now())
     updated_at  DateTime     @updatedAt
@@ -52,7 +46,7 @@ model List {
 
 model ListItem {
     id         Int      @id @default(autoincrement())
-    title      String   @db.VarChar(255)
+    title      String
     status     Boolean  @default(false)
     created_at DateTime @default(now())
     updated_at DateTime @updatedAt

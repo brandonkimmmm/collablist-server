@@ -13,13 +13,7 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
     logger: Logger = new Logger(PrismaService.name);
 
     constructor(private configService: ConfigService) {
-        super({
-            datasources: {
-                db: {
-                    url: configService.get<string>('DATABASE_URL')
-                }
-            }
-        });
+        super();
     }
 
     generatePaginationQuery(limit: number, page: number) {
