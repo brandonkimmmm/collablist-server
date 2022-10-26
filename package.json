@@ -14,7 +14,7 @@
 	"scripts": {
 		"prebuild": "rimraf dist",
 		"build": "nest build",
-		"db:migrate": "prisma db migrate deploy",
+		"db:migrate": "prisma migrate deploy",
 		"db:seed": "prisma db seed && ts-node prisma/seeders/dummy.ts",
 		"format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
 		"start": "nest start",
