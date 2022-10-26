@@ -41,8 +41,9 @@ export class ListService {
                 }
             }
         });
+        if (reqUser.role === USER_ROLE.ADMIN) return;
         if (
-            reqUser.role !== USER_ROLE.ADMIN && opts.is_owner
+            opts.is_owner
                 ? list.user_id !== reqUser.id
                 : list.user_id !== reqUser.id &&
                   !list.members.find((m) => m.user_id === reqUser.id)
