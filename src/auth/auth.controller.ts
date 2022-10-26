@@ -56,6 +56,7 @@ export class AuthController {
             username
         }: PostSignupDTO
     ) {
+        throw new BadRequestException('Cannot signup at this time');
         if (password !== password_confirmation)
             throw new BadRequestException(INVALID_PASSWORD_CONFIRMATION);
         const isTakenEmail = await this.userService.isExistingUserEmail(email);
